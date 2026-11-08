@@ -11,3 +11,5 @@ type: decisions
 | 2026-11-08 | One Inkbird ITC-308 per cold unit, compressor delay 3-5 min | Cooling mode plus delay; WH1436A has no cooling |
 | 2026-11-08 | Pi (Home Assistant) + ESP32 nodes as monitors first; hardware controllers stay in charge | Controllers keep working if Wi-Fi fails |
 | 2026-11-08 | Logging: Home Assistant/InfluxDB/Grafana for sensors, markdown for observations and KB | Agent can read markdown directly; Myco Vault has no sensor or yield logging |
+| 2026-11-08 | First-run cold-stage container: 5 identical plastic totes with lids, 8.5 x 5 x 5 in, stacked in the Bangson mini-fridge (door closes, per Patrick). 2 x 11x11x3 in trays kept as a later tray-size comparison | Replication (e.g. 3 control + 2 treatment) and 5 in depth outweigh about 14% more surface from 2 larger trays. Inferred, untested |
+| 2026-11-08 | Bangson interior planning figure is Patrick's measurement (lower ~1/4 unusable due to shelf and side wall), not the vendor's 2.26 cu ft | Vendor figure is marketing and does not match the real usable space |
