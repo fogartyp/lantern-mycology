@@ -1,0 +1,48 @@
+# Untested starter config for the tent monitor node. Confirm pins against your ESP32 board.
+# Monitor-only phase: do not connect relays; the existing controllers stay in charge.
+esphome:
+  name: morel-tent
+
+esp32:
+  board: esp32dev
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+logger:
+ota:
+  - platform: esphome
+
+i2c:
+  sda: 21
+  scl: 22
+
+one_wire:
+  - platform: gpio
+    pin: GPIO4
+
+sensor:
+  - platform: scd4x
+    co2: {name: "Tent CO2"}
+    temperature: {name: "Tent Temp (SCD41)"}
+    humidity: {name: "Tent RH (SCD41)"}
+    update_interval: 30s
+  - platform: sht4x
+    temperature: {name: "Tent Temp (SHT45)"}
+    humidity: {name: "Tent RH (SHT45)"}
+    update_interval: 30s
+  - platform: dallas_temp
+    name: "Soil Temp"
+    update_interval: 30s
+  - platform: adc
+    pin: GPIO34
+    name: "Soil Moisture Raw"
+    attenuation: 12db
+    update_interval: 60s
+
+binary_sensor:
+  - platform: gpio
+    pin: {number: GPIO35, mode: INPUT_PULLUP, inverted: true}
+    name: "Reservoir Low"
