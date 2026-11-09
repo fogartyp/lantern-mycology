@@ -15,7 +15,8 @@ tags: [mycology, morel, project]
 3. [[00-protocols/Open Questions]] - what we don't know yet
 4. [[Hardware/Equipment]] - tent, controllers, sensors
 5. [[06-decisions/Decision Log]] - what we chose and why
-6. Templates: [[Templates/Daily Log]], [[Templates/Weekly Review]], [[Templates/Monthly Review]], [[Templates/Run Note]], [[Templates/Experiment Note]]
+6. [[Resources]] - community links, guides and papers
+7. Templates: [[Templates/Daily Log]], [[Templates/Weekly Review]], [[Templates/Monthly Review]], [[Templates/Run Note]], [[Templates/Experiment Note]]
 
 ## Folders
 - `00-protocols/` current best-known targets and open questions
