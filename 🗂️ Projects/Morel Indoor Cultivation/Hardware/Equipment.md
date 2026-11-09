@@ -33,3 +33,11 @@ No owned device does gentle timed air exchange (0.05-0.3 m/s in short bursts). F
 
 ## Starter ESPHome config
 See [[Hardware/morel-tent.esphome.yaml]] (untested; confirm pins).
+
+## Bangson mini-fridge (owned; updated 2026-11-08)
+- Brand Bangson, 2-door with freezer box. Patrick confirmed it matches the vendor page for the 3.2 cu ft model (model label number not yet logged).
+- Vendor claims (marketing, untested): exterior 19.68 x 17.9 x 34.01 in; 5-position knob; fridge range 33.8-46.4F. Source: bangsontech.com 3.2 cu ft 2-door listing.
+- **Measured by Patrick:** interior is not a clean box; lower ~1/4 is unusable (shelf and side wall). A tote 8.5 x 5 x 5 in fits; about 5 stacked, door closes (loaded check done with the stack).
+- Compressor unit (R600a label seen in photos; which unit it was on is not confirmed). Keep R600a lines intact; unplug before cleaning.
+- Use: first-run trays/spawn per [[06-decisions/Decision Log]]. Real internal temperature not yet logged; log with a probe before use.
+- Wine cooler: brand, model, compressor type and range still unknown (front panel read about 48F, setpoint unverified).
