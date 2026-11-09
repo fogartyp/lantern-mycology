@@ -41,3 +41,6 @@ See [[Hardware/morel-tent.esphome.yaml]] (untested; confirm pins).
 - Compressor unit (R600a label seen in photos; which unit it was on is not confirmed). Keep R600a lines intact; unplug before cleaning.
 - Use: first-run trays/spawn per [[06-decisions/Decision Log]]. Real internal temperature not yet logged; log with a probe before use.
 - Wine cooler: brand, model, compressor type and range still unknown (front panel read about 48F, setpoint unverified).
+
+## Parts list
+See [[Hardware/Parts List]] (draft, not ordered).
