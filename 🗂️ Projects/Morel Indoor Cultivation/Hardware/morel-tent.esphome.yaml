@@ -1,48 +1,125 @@
-# Untested starter config for the tent monitor node. Confirm pins against your ESP32 board.
-# Monitor-only phase: do not connect relays; the existing controllers stay in charge.
+# Morel tent monitor node (ESP32). MONITOR ONLY: no relays, no mains outputs.
+# Existing controllers (MYCOntroller, IHC200, WH1436A) stay in charge.
+# Status: DRAFT. Validated with `esphome config` only; not flashed, pins not tested on hardware.
+# Secrets (wifi, api key, ota password) live in secrets.yaml, never in the vault.
+# Soil/surface temp vs air temp are separate sensors on purpose: label which one you mean.
+
+substitutions:
+  node: morel-tent
+  friendly: "Morel Tent"
+
 esphome:
-  name: morel-tent
+  name: ${node}
+  friendly_name: ${friendly}
 
 esp32:
   board: esp32dev
+  framework:
+    type: esp-idf
+
+logger:
+  level: INFO
+
+api:
+  encryption:
+    key: !secret api_key
+  reboot_timeout: 0s   # keep running and logging if Home Assistant is down
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
+  reboot_timeout: 0s   # sensor node must not reboot-loop in a weak basement signal
+  ap:
+    ssid: "${node}-fallback"
+    password: !secret ap_password
 
-api:
-logger:
-ota:
-  - platform: esphome
-
+# I2C bus: SCD41 (0x62) and SHT45 (0x44)
 i2c:
-  sda: 21
-  scl: 22
+  sda: GPIO21
+  scl: GPIO22
+  scan: true
 
+# 1-Wire bus: DS18B20 soil probe. 4.7k pull-up from data to 3.3V required.
 one_wire:
   - platform: gpio
     pin: GPIO4
 
 sensor:
+  # Air CO2 / temp / RH (SCD41). Altitude/pressure compensation: set after install if needed.
   - platform: scd4x
-    co2: {name: "Tent CO2"}
-    temperature: {name: "Tent Temp (SCD41)"}
-    humidity: {name: "Tent RH (SCD41)"}
+    co2:
+      name: "Tent CO2"
+      id: tent_co2
+    temperature:
+      name: "Tent Air Temp (SCD41)"
+      id: tent_temp_scd
+      filters: [{sliding_window_moving_average: {window_size: 4, send_every: 4}}]
+    humidity:
+      name: "Tent Air RH (SCD41)"
+      id: tent_rh_scd
     update_interval: 30s
+
+  # Second air sensor (SHT45) = twin for drift checks against the SCD41.
   - platform: sht4x
-    temperature: {name: "Tent Temp (SHT45)"}
-    humidity: {name: "Tent RH (SHT45)"}
+    temperature:
+      name: "Tent Air Temp (SHT45)"
+      id: tent_temp_sht
+    humidity:
+      name: "Tent Air RH (SHT45)"
+      id: tent_rh_sht
+    precision: High
+    heater_max_duty: 0.0   # SHT heater OFF (it would warm the reading)
     update_interval: 30s
+
+  # Drift between twins (warning alert is set in Home Assistant, not here)
+  - platform: template
+    name: "Tent Temp Twin Delta"
+    unit_of_measurement: "°C"
+    lambda: 'return id(tent_temp_scd).state - id(tent_temp_sht).state;'
+    update_interval: 60s
+  - platform: template
+    name: "Tent RH Twin Delta"
+    unit_of_measurement: "%"
+    lambda: 'return id(tent_rh_scd).state - id(tent_rh_sht).state;'
+    update_interval: 60s
+
+  # Soil/surface temperature (DS18B20). With one probe, address can be omitted.
+  # If you add more probes, run once, read addresses from the log, then pin each.
   - platform: dallas_temp
     name: "Soil Temp"
+    id: soil_temp
     update_interval: 30s
+
+  # Capacitive soil moisture. RAW counts only until calibrated in dry air and in water.
+  # GPIO34 is ADC1, input-only: fine (ADC2 conflicts with Wi-Fi).
   - platform: adc
     pin: GPIO34
     name: "Soil Moisture Raw"
     attenuation: 12db
     update_interval: 60s
+    filters: [{sliding_window_moving_average: {window_size: 5, send_every: 5}}]
+    # Add a calibrate_linear filter after calibration (dry count -> 0 %, wet count -> 100 %)
+
+  - platform: wifi_signal
+    name: "Tent Node WiFi Signal"
+    update_interval: 120s
+  - platform: uptime
+    name: "Tent Node Uptime"
+    update_interval: 300s
 
 binary_sensor:
+  # Reservoir float switch. Input-only pins (GPIO34-39) have NO internal pull-up,
+  # so use GPIO32 with INPUT_PULLUP. Wire switch between GPIO32 and GND.
+  # ASSUMES: switch is CLOSED when water is LOW. Check your float switch and flip `inverted` if not.
   - platform: gpio
-    pin: {number: GPIO35, mode: INPUT_PULLUP, inverted: true}
+    pin: {number: GPIO32, mode: INPUT_PULLUP}
     name: "Reservoir Low"
+    device_class: problem
+    filters: [{delayed_on_off: 5s}]
+
+  - platform: status
+    name: "Tent Node Status"
