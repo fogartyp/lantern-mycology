@@ -1,0 +1,72 @@
+# Bangson mini-fridge monitor node (ESP32). MONITOR ONLY: no relays, no mains outputs.
+# Purpose: empty-chamber test. Log true AIR temperature at the top and bottom of the fridge section.
+# The fridge thermostat (and the ITC-308, if fitted) stay in charge. Nothing here switches the compressor.
+# Status: DRAFT. Validated with `esphome config` only; not flashed, not tested on hardware.
+# Probe addresses are PLACEHOLDERS. Flash once, read the two addresses from the boot log,
+# label which probe is top and bottom, then paste them in and re-flash.
+# Secrets live in secrets.yaml, never in the vault.
+
+substitutions:
+  node: bangson-fridge
+  friendly: "Bangson Fridge"
+
+esphome:
+  name: ${node}
+  friendly_name: ${friendly}
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+logger:
+  level: INFO
+
+api:
+  encryption:
+    key: !secret api_key_bangson
+  reboot_timeout: 0s   # keep logging if Home Assistant is down
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  reboot_timeout: 0s
+  ap:
+    ssid: "${node}-fallback"
+    password: !secret ap_password
+
+# One 1-Wire bus, two DS18B20 probes, one 4.7k pull-up from data to 3.3V.
+one_wire:
+  - platform: gpio
+    pin: GPIO4
+
+sensor:
+  - platform: dallas_temp
+    address: 0x0000000000000000   # PLACEHOLDER: top probe
+    name: "Bangson Top Air Temp"
+    id: bangson_top
+    update_interval: 30s
+  - platform: dallas_temp
+    address: 0x0000000000000001   # PLACEHOLDER: bottom probe (must differ from top)
+    name: "Bangson Bottom Air Temp"
+    id: bangson_bottom
+    update_interval: 30s
+  - platform: template
+    name: "Bangson Top-Bottom Delta"
+    unit_of_measurement: "°C"
+    lambda: 'return id(bangson_top).state - id(bangson_bottom).state;'
+    update_interval: 60s
+  - platform: wifi_signal
+    name: "Bangson Node WiFi Signal"
+    update_interval: 120s
+  - platform: uptime
+    name: "Bangson Node Uptime"
+    update_interval: 300s
+
+binary_sensor:
+  - platform: status
+    name: "Bangson Node Status"
