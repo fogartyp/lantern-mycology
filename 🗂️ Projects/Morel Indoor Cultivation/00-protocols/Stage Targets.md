@@ -16,6 +16,7 @@ Source notes: [[Morel Planting Guide 2026]], [[Penn State Thesis]], [[US11925146
 | Colonize | 55-68F | 1-2 months | [[Morel Planting Guide 2026]] | vendor guide |
 | Colonize (Chinese method) | soil 4-18C, soil moisture 20-30% | 40-60 days | [[US11925146 Chinese Patent]] | patent |
 | Vernalize (cold) | 41-55F | varies | [[Morel Planting Guide 2026]] | vendor guide |
+| Dormancy (outdoor) | below 40F, no active growth; does not count toward grow time | varies | [[Morel Planting Guide 2026]] | vendor guide (outdoor air) |
 | Trigger | 45-59F, ~85% RH, deep soak | 2-4 weeks | [[Morel Planting Guide 2026]] | vendor guide |
 | Trigger (soilless) | continuous watering 5-24 h after 4C chill | - | [[Masaphy 2010]] | peer-reviewed |
 | Fruit | 65-82F air, 75-85% RH | up to 2 months | [[Morel Planting Guide 2026]] | vendor guide (outdoor air temps) |
